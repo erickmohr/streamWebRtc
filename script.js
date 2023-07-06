@@ -13,7 +13,10 @@ const signalingSocket = new WebSocket(signalingServerUrl);
 signalingSocket.onmessage = async (event) => {
   const message = JSON.parse(event.data);
 
-  if (message.type === 'offer') {
+  if (message.type === 'video') {
+    // Exibir vídeo recebido no elemento de vídeo correspondente
+    remoteVideo.srcObject = message.videoStream;
+  } else if (message.type === 'offer') {
     // Receber oferta SDP do outro navegador
     await receiveOffer(message.offer);
   } else if (message.type === 'answer') {
@@ -24,6 +27,7 @@ signalingSocket.onmessage = async (event) => {
     await addIceCandidate(message.candidate);
   }
 };
+
 
 // Função para inicializar a conexão WebRTC
 async function initialize() {
@@ -66,7 +70,7 @@ async function initialize() {
     // Configurar oferta local como descrição local
     await localPeerConnection.setLocalDescription(offer);
 
-    // Enviar oferta para o outro navegador atravésdo servidor de sinalização
+    // Enviar oferta para o outro navegador através do servidor de sinalização
     sendOffer(localPeerConnection.localDescription);
   } catch (error) {
     console.error('Erro:', error);
@@ -85,7 +89,7 @@ async function receiveOffer(offer) {
     // Configurar resposta remota como descrição remota
     await remotePeerConnection.setLocalDescription(answer);
 
-    // Enviar resposta para o outro navegador através do servidor de sinalização
+    // Enviar resposta para o outro navegador através do servidorde sinalização
     sendAnswer(remotePeerConnection.localDescription);
   } catch (error) {
     console.error('Erro:', error);
@@ -143,4 +147,3 @@ function sendIceCandidate(candidate) {
 
 // Inicializar a conexão WebRTC quando a página for carregada
 window.onload = initialize;
-
