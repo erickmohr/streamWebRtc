@@ -7,7 +7,7 @@ let localPeerConnection;
 let remotePeerConnection;
 
 // Configuração do servidor de sinalização
-const signalingServerUrl = 'ws://localhost:8080'; // URL do servidor de sinalização
+const signalingServerUrl = 'ws://localhost:8888'; // URL do servidor de sinalização
 const signalingSocket = new WebSocket(signalingServerUrl);
 
 signalingSocket.onmessage = async (event) => {
@@ -115,7 +115,8 @@ async function addIceCandidate(candidate) {
 function sendOffer(offer) {
   const message = {
     type: 'offer',
-    offer: offer
+    offer: offer,
+    recipientId: 'server' // Identificador único do servidor
   };
   signalingSocket.send(JSON.stringify(message));
 }
@@ -124,10 +125,12 @@ function sendOffer(offer) {
 function sendAnswer(answer) {
   const message = {
     type: 'answer',
-    answer: answer
+    answer: answer,
+    recipientId: 'client' // Identificador único do cliente
   };
   signalingSocket.send(JSON.stringify(message));
 }
+
 
 // Função para enviar candidato ICE para o outro navegador através do servidor de sinalização
 function sendIceCandidate(candidate) {
